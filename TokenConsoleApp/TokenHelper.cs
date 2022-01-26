@@ -10,16 +10,13 @@ namespace TokenConsoleApp
 {
     internal static class TokenHelper
     {
-        public static async Task<string> GetAuthorizeToken()
+        public static async Task<string> GetAuthorizeToken(AuthSettings settings)
         {
-            // Initialization.  
-            string responseObj = string.Empty;
-
             // Posting.  
             using var client = new HttpClient();
 
             // Setting AuthService URL.  
-            client.BaseAddress = new Uri("https://auth-api-test.streamline.laboremus.ug/");
+            client.BaseAddress = new Uri(settings.Authority);
 
             // Setting content type.  
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
@@ -28,8 +25,8 @@ namespace TokenConsoleApp
             List<KeyValuePair<string, string>> allIputParams = new List<KeyValuePair<string, string>>()
             {
                 new KeyValuePair<string, string>("grant_type", "client_credentials"),
-                new KeyValuePair<string, string>("client_id", string.Empty), // replace with clientid
-                new KeyValuePair<string, string>("client_secret", string.Empty), //replace with client secret
+                new KeyValuePair<string, string>("client_id", settings.ClientId), 
+                new KeyValuePair<string, string>("client_secret", settings.ClientSecret), 
             };
 
             // Convert Request Params to Key Value Pair.  
@@ -40,6 +37,8 @@ namespace TokenConsoleApp
             // HTTP POST  
             var response = await client.PostAsync("connect/token", requestParams);
 
+            // Initialization.  
+            string responseObj;
             // Verification  
             if (response.IsSuccessStatusCode)
             {
